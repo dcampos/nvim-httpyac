@@ -1,7 +1,7 @@
 local M = {}
 M.buffer_number = -1
 
-M.open_buffer = function()
+M.open_buffer = function(mods)
     -- Get a boolean that tells us if the buffer number is visible anymore.
     -- :help bufwinnr
     local buffer_visible = vim.api.nvim_call_function("bufwinnr", { M.buffer_number }) ~= -1
@@ -9,7 +9,7 @@ M.open_buffer = function()
     if M.buffer_number == -1 or not buffer_visible then
         -- Create a new buffer with the name "HTTPYAC_OUT".
         -- Same name will reuse the current buffer.
-        vim.api.nvim_command("botright vsplit HTTPYAC_OUT")
+        vim.api.nvim_command(mods .. " botright vsplit HTTPYAC_OUT")
 
         -- Collect the buffer's number.
         M.buffer_number = vim.api.nvim_get_current_buf()
@@ -20,7 +20,8 @@ M.open_buffer = function()
 end
 
 M.log = function(data)
-    if data then
+    -- check if data exists and isn't empty
+    if data and #data > 0 then
         -- Append the data.
         vim.api.nvim_set_option_value("readonly", false, { buf = M.buffer_number })
         vim.api.nvim_buf_set_text(M.buffer_number, 0, 0, -1, -1, vim.split(data, "\n"))
